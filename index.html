@@ -150,8 +150,8 @@
     <div id="sidebar">
         <h2>Menu</h2>
         <div id="tabs">
-            <button id="tab-current" onclick="showTab('current')" class="active">Current</button>
-            <button id="tab-history" onclick="showTab('history')">History</button>
+            <button id="tab-current" onclick="showTab('current')" class="active">Поточні дані</button>
+            <button id="tab-history" onclick="showTab('history')">Попередні лог дані</button>
         </div>
         <div id="file-list"></div>
     </div>
@@ -161,19 +161,18 @@
         <!-- Current -->
         <div id="current">
             <div class="content-header">
-                <h2>Current session</h2>
+                <h2>Поточні дані</h2>
                 <div>
-                    <button class="action" onclick="newFile()">Start new file</button>
-                    <button class="action" onclick="printSelection()">Print selection</button>
-                    <button class="action" onclick="saveSelection()">Save selection</button>
-                    <button class="action" onclick="printAll()">Print all</button>
-                    <button class="action" onclick="saveAll()">Save all</button>
+                    <button class="action" onclick="newFile()">Почати новий лог</button>
+                    <button class="action" onclick="saveSelection()">Зберегти виділений текст в файл</button>
+                    <button class="action" onclick="printSelection()">Надрукувати виділений текст</button>
+                    <button class="action" onclick="saveAll()">Зберегти лог в файл</button>
+                    <button class="action" onclick="printAll()">Надрукувати лог</button>
                 </div>
                 <div>
-                    <input type="text" id="search-current" placeholder="Search in current..."
-                        oninput="searchInCurrent()" />
-                    <button class="action" onclick="prevMatch('current')">Prev</button>
-                    <button class="action" onclick="nextMatch('current')">Next</button>
+                    <input type="text" id="search-current" placeholder="Пошук..." oninput="searchInCurrent()" />
+                    <button class="action" onclick="prevMatch('current')">Попередній</button>
+                    <button class="action" onclick="nextMatch('current')">Наступний</button>
                     <span id="counter-current" class="counter"></span>
                 </div>
             </div>
@@ -185,16 +184,16 @@
         <!-- History -->
         <div id="history" style="display:none;">
             <div class="content-header">
-                <h2>History</h2>
+                <h2>Попередній лог</h2>
                 <div>
                     <input type="text" id="search-box" placeholder="Search in file..." oninput="searchInHistory()" />
-                    <button class="action" onclick="prevMatch('history')">Prev</button>
-                    <button class="action" onclick="nextMatch('history')">Next</button>
+                    <button class="action" onclick="prevMatch('history')">Попередній</button>
+                    <button class="action" onclick="nextMatch('history')">Наступний</button>
                     <span id="counter-history" class="counter"></span>
                 </div>
                 <div>
-                    <button class="action" onclick="printHistory()">Print this file</button>
-                    <button class="action" onclick="saveHistory()">Save this file as…</button>
+                    <button class="action" onclick="printHistory()">Роздрукувати лог</button>
+                    <button class="action" onclick="saveHistory()">Зберегти в файл</button>
                 </div>
             </div>
             <div class="content-body">

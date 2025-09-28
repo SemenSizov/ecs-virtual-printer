@@ -9,14 +9,14 @@ const jobsDir = path.join(__dirname, "print_jobs");
 if (!fs.existsSync(jobsDir)) fs.mkdirSync(jobsDir);
 
 let currentFile = null;
-let printerStatus = 0; // 0=idle, 128=printing
+let printerStatus = 0;
 
 function timestampName(prefix = "") {
     const now = new Date();
     const name = now.toISOString()
-        .replace(/T/, "_")      // розділяємо дату й час
-        .replace(/\..+/, "")    // прибираємо мілісекунди
-        .replace(/:/g, "-");    // замінюємо :
+        .replace(/T/, "_")
+        .replace(/\..+/, "")
+        .replace(/:/g, "-");
     return prefix ? `${prefix}_${name}` : name;
 }
 
@@ -35,7 +35,7 @@ app.on("ready", () => {
     });
     mainWindow.loadFile("index.html");
 
-    // створити перший файл
+
     newFile();
 
     // TCP 9100 (raw print)
@@ -137,7 +137,7 @@ app.on("ready", () => {
     );
 });
 
-// IPC від Renderer
+// IPC from Renderer
 ipcMain.on("new-file", () => newFile());
 ipcMain.on("print-selection", (e, text) => {
     const win = new BrowserWindow({ show: false });

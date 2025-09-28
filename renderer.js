@@ -17,10 +17,8 @@ ipcRenderer.on("printer-data", (e, data) => {
 
     const term = document.getElementById("search-current").value;
     if (term) {
-        // якщо пошук активний → оновлюємо підсвітку
         highlightText(log, term, "current");
     } else {
-        // додаємо текст і скролимо вниз
         log.textContent += data;
         log.scrollTop = log.scrollHeight;
     }
@@ -41,14 +39,13 @@ ipcRenderer.on("history-list", (e, files) => {
         const div = document.createElement("div");
         div.className = "file-item";
 
-        // прибираємо ".prn" і замінюємо "_" на пробіл, "-" на ":" у часі
-        let displayName = f.name.replace(".prn", "");        // 2025-09-25_15-04-12
-        displayName = displayName.replace("_", " ");         // 2025-09-25 15-04-12
+        let displayName = f.name.replace(".prn", "");
+        displayName = displayName.replace("_", " ");
         displayName = displayName.replace(/-/g, (m, i) =>
-            i > displayName.indexOf(" ") ? ":" : "-");         // 2025-09-25 15:04:12
+            i > displayName.indexOf(" ") ? ":" : "-");
 
         div.textContent = displayName;
-        div.title = f.name; // залишимо підказку з повною назвою файлу
+        div.title = f.name;
         div.onclick = () => {
             document.querySelectorAll(".file-item").forEach(el => el.classList.remove("active"));
             div.classList.add("active");
@@ -69,15 +66,12 @@ ipcRenderer.on("history-file", (e, { filePath, content }) => {
 
 // === Tab switch ===
 function showTab(id) {
-    // показати/сховати контент
     document.getElementById("current").style.display = (id === "current") ? "block" : "none";
     document.getElementById("history").style.display = (id === "history") ? "block" : "none";
 
-    // перемкнути активність кнопок
     document.getElementById("tab-current").classList.toggle("active", id === "current");
     document.getElementById("tab-history").classList.toggle("active", id === "history");
 
-    // показати список файлів тільки в історії
     document.getElementById("file-list").style.display = (id === "history") ? "block" : "none";
 
     if (id === "history") {
@@ -121,7 +115,6 @@ function highlightText(container, term, mode) {
         return;
     }
 
-    // ескейп спецсимволів RegExp
     const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     const regex = new RegExp(`(${escaped})`, "gi");
 
@@ -129,7 +122,6 @@ function highlightText(container, term, mode) {
     const marks = Array.from(container.querySelectorAll("mark"));
     searchState[mode] = { matches: marks, index: marks.length ? 0 : -1 };
 
-    // підсвітити перший збіг як активний
     if (marks.length) {
         marks[0].classList.add("active-mark");
         marks[0].scrollIntoView({ behavior: "smooth", block: "center" });
@@ -181,7 +173,6 @@ function searchInHistory() {
     highlightText(historyContent, term, "history");
 }
 
-// експорт у глобал (щоб кнопки/інпути з HTML бачили функції)
 window.showTab = showTab;
 window.newFile = newFile;
 window.printSelection = printSelection;
