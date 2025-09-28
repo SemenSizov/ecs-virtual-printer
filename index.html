@@ -176,25 +176,25 @@
 <body>
     <!-- Sidebar -->
     <div id="sidebar">
-        <h2>Menu</h2>
+        <h2>Меню</h2>
         <div id="tabs">
-            <button id="tab-current" onclick="showTab('current')" class="active">Поточні дані</button>
+            <button id="tab-current" onclick="showTab('current')" class="active">Поточний лог</button>
             <button id="tab-history" onclick="showTab('history')">Попередні логи</button>
         </div>
 
         <div id="actions-current">
-            <h3>Дії (Поточний)</h3>
+            <h3>Дії</h3>
             <button onclick="newFile()">Новий лог</button>
-            <button onclick="saveSelection()">Зберегти виділене</button>
+            <button onclick="saveSelection()">Зберегти виділене як...</button>
             <button onclick="printSelection()">Друк виділеного</button>
-            <button onclick="saveAll()">Зберегти весь лог</button>
-            <button onclick="printAll()">Друк всього логу</button>
+            <button onclick="saveAll()">Зберегти як...</button>
+            <button onclick="printAll()">Друк</button>
         </div>
 
         <div id="actions-history" style="display:none;">
-            <h3>Дії (Історія)</h3>
-            <button onclick="printHistory()">Друк історії</button>
-            <button onclick="saveHistory()">Зберегти історію</button>
+            <h3>Дії</h3>
+            <button onclick="saveHistory()">Зберегти як...</button>
+            <button onclick="printHistory()">Друк</button>
         </div>
 
         <div id="search">
@@ -202,7 +202,7 @@
 
             <!-- Поточний -->
             <div id="search-current-wrapper">
-                <input type="text" id="search-current" placeholder="Пошук у поточному..." oninput="searchInCurrent()" />
+                <input type="text" id="search-current" placeholder="Пошук..." oninput="searchInCurrent()" />
                 <div class="search-controls" id="search-current-controls">
                     <button onclick="prevMatch('current')">◀</button>
                     <button onclick="nextMatch('current')">▶</button>
@@ -212,7 +212,7 @@
 
             <!-- Історія -->
             <div id="search-history-wrapper" style="display:none;">
-                <input type="text" id="search-box" placeholder="Пошук в історії..." oninput="searchInHistory()" />
+                <input type="text" id="search-box" placeholder="Пошук..." oninput="searchInHistory()" />
                 <div class="search-controls" id="search-history-controls">
                     <button onclick="prevMatch('history')">◀</button>
                     <button onclick="nextMatch('history')">▶</button>
