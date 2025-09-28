@@ -13,7 +13,6 @@
             height: 100vh;
             display: flex;
             overflow: hidden;
-            /* блокуємо глобальний скрол */
         }
 
         #sidebar {
@@ -63,8 +62,7 @@
         }
 
         #actions-current button,
-        #actions-history button,
-        #search button {
+        #actions-history button {
             width: 100%;
             margin-bottom: 5px;
             padding: 6px 10px;
@@ -76,8 +74,7 @@
         }
 
         #actions-current button:hover,
-        #actions-history button:hover,
-        #search button:hover {
+        #actions-history button:hover {
             background: #145a9e;
         }
 
@@ -90,12 +87,33 @@
             box-sizing: border-box;
         }
 
+        .search-controls {
+            display: flex;
+            align-items: center;
+        }
+
+        .search-controls button {
+            width: 32px;
+            height: 32px;
+            margin-right: 5px;
+            padding: 0;
+            border: none;
+            border-radius: 4px;
+            background: #1976d2;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .search-controls button:hover {
+            background: #145a9e;
+        }
+
         .counter {
-            display: block;
-            text-align: center;
+            flex: 1;
+            text-align: right;
             font-weight: bold;
             color: #555;
-            margin-top: 3px;
         }
 
         #file-list {
@@ -143,7 +161,6 @@
             overflow-wrap: break-word;
         }
 
-
         mark {
             background: yellow;
             color: black;
@@ -182,19 +199,25 @@
 
         <div id="search">
             <h3>Пошук</h3>
-            <input type="text" id="search-current" placeholder="Пошук у поточному..." oninput="searchInCurrent()" />
-            <div id="search-current-controls">
-                <button onclick="prevMatch('current')">◀ Поточний</button>
-                <button onclick="nextMatch('current')">▶ Поточний</button>
-                <span id="counter-current" class="counter"></span>
+
+            <!-- Поточний -->
+            <div id="search-current-wrapper">
+                <input type="text" id="search-current" placeholder="Пошук у поточному..." oninput="searchInCurrent()" />
+                <div class="search-controls" id="search-current-controls">
+                    <button onclick="prevMatch('current')">◀</button>
+                    <button onclick="nextMatch('current')">▶</button>
+                    <span id="counter-current" class="counter"></span>
+                </div>
             </div>
 
-            <input type="text" id="search-box" placeholder="Пошук в історії..." oninput="searchInHistory()"
-                style="display:none;" />
-            <div id="search-history-controls" style="display:none;">
-                <button onclick="prevMatch('history')">◀ Історія</button>
-                <button onclick="nextMatch('history')">▶ Історія</button>
-                <span id="counter-history" class="counter"></span>
+            <!-- Історія -->
+            <div id="search-history-wrapper" style="display:none;">
+                <input type="text" id="search-box" placeholder="Пошук в історії..." oninput="searchInHistory()" />
+                <div class="search-controls" id="search-history-controls">
+                    <button onclick="prevMatch('history')">◀</button>
+                    <button onclick="nextMatch('history')">▶</button>
+                    <span id="counter-history" class="counter"></span>
+                </div>
             </div>
         </div>
 
@@ -203,12 +226,8 @@
 
     <!-- Content -->
     <div id="content">
-        <!-- Current -->
-        <div id="log" class="log-view" contenteditable="true"></div>
-
-        <!-- History -->
-        <div id="history-content" class="log-view"></div>
-
+        <div id="log" contenteditable="true"></div>
+        <div id="history-content" style="display:none;"></div>
     </div>
 
     <script src="renderer.js"></script>

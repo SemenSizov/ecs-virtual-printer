@@ -5,6 +5,9 @@ const historyList = document.getElementById("file-list");
 const historyContent = document.getElementById("history-content");
 
 let currentHistoryFile = null;
+let logRaw = "";
+let historyRaw = "";
+
 let searchState = {
     current: { matches: [], index: -1 },
     history: { matches: [], index: -1 }
@@ -12,21 +15,19 @@ let searchState = {
 
 // === Current session ===
 ipcRenderer.on("printer-data", (e, data) => {
-    const raw = (log.dataset.raw || log.textContent) + data;
-    log.dataset.raw = raw;
-
+    logRaw += data;
     const term = document.getElementById("search-current").value;
     if (term) {
-        highlightText(log, term, "current");
+        highlightText(log, term, "current", logRaw);
     } else {
         log.textContent += data;
-        log.scrollTop = log.scrollHeight; // автоскрол вниз
+        log.scrollTop = log.scrollHeight;
     }
 });
 
 ipcRenderer.on("new-file", (e, name) => {
     log.textContent = "";
-    log.dataset.raw = "";
+    logRaw = "";
     searchState.current = { matches: [], index: -1 };
     updateCounter("current");
     console.log("Started new file:", name);
@@ -58,38 +59,44 @@ ipcRenderer.on("history-list", (e, files) => {
 
 ipcRenderer.on("history-file", (e, { filePath, content }) => {
     currentHistoryFile = filePath;
+    historyRaw = content;
     historyContent.textContent = content;
-    historyContent.dataset.raw = content;
     searchState.history = { matches: [], index: -1 };
     updateCounter("history");
 });
 
 // === Tab switch ===
 function showTab(id) {
-    document.getElementById("log").style.display = (id === "current") ? "block" : "none";
-    document.getElementById("history-content").style.display = (id === "history") ? "block" : "none";
+    const isCurrent = id === "current";
 
-    document.getElementById("tab-current").classList.toggle("active", id === "current");
-    document.getElementById("tab-history").classList.toggle("active", id === "history");
+    document.getElementById("log").style.display = isCurrent ? "block" : "none";
+    document.getElementById("history-content").style.display = isCurrent ? "none" : "block";
 
-    // Дії
-    document.getElementById("actions-current").style.display = (id === "current") ? "block" : "none";
-    document.getElementById("actions-history").style.display = (id === "history") ? "block" : "none";
+    document.getElementById("tab-current").classList.toggle("active", isCurrent);
+    document.getElementById("tab-history").classList.toggle("active", !isCurrent);
 
-    // Пошук
-    document.getElementById("search-current").style.display = (id === "current") ? "block" : "none";
-    document.getElementById("search-current-controls").style.display = (id === "current") ? "block" : "none";
+    document.getElementById("actions-current").style.display = isCurrent ? "block" : "none";
+    document.getElementById("actions-history").style.display = isCurrent ? "none" : "block";
 
-    document.getElementById("search-box").style.display = (id === "history") ? "block" : "none";
-    document.getElementById("search-history-controls").style.display = (id === "history") ? "block" : "none";
+    document.getElementById("search-current-wrapper").style.display = isCurrent ? "block" : "none";
+    document.getElementById("search-history-wrapper").style.display = isCurrent ? "none" : "block";
 
-    // Список файлів
-    document.getElementById("file-list").style.display = (id === "history") ? "block" : "none";
+    document.getElementById("file-list").style.display = isCurrent ? "none" : "block";
 
-    if (id === "history") {
+    if (isCurrent) {
+        document.getElementById("search-current").value = "";
+        document.getElementById("counter-current").textContent = "";
+        log.textContent = logRaw;
+        searchState.current = { matches: [], index: -1 };
+    } else {
+        document.getElementById("search-box").value = "";
+        document.getElementById("counter-history").textContent = "";
+        historyContent.textContent = historyRaw;
+        searchState.history = { matches: [], index: -1 };
         ipcRenderer.send("get-history");
     }
 }
+
 
 
 // === Actions ===
@@ -117,12 +124,9 @@ function saveHistory() {
 }
 
 // === Search / Highlight with counter ===
-function highlightText(container, term, mode) {
-    const raw = container.dataset.raw || container.textContent;
-    container.dataset.raw = raw;
-
+function highlightText(container, term, mode, rawText) {
     if (!term) {
-        container.textContent = raw;
+        container.textContent = rawText;
         searchState[mode] = { matches: [], index: -1 };
         updateCounter(mode);
         return;
@@ -131,7 +135,7 @@ function highlightText(container, term, mode) {
     const escaped = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     const regex = new RegExp(`(${escaped})`, "gi");
 
-    container.innerHTML = raw.replace(regex, `<mark>$1</mark>`);
+    container.innerHTML = rawText.replace(regex, `<mark>$1</mark>`);
     const marks = Array.from(container.querySelectorAll("mark"));
     searchState[mode] = { matches: marks, index: marks.length ? 0 : -1 };
 
@@ -178,12 +182,12 @@ function prevMatch(mode) {
 // === Wire search inputs ===
 function searchInCurrent() {
     const term = document.getElementById("search-current").value;
-    highlightText(log, term, "current");
+    highlightText(log, term, "current", logRaw);
 }
 
 function searchInHistory() {
     const term = document.getElementById("search-box").value;
-    highlightText(historyContent, term, "history");
+    highlightText(historyContent, term, "history", historyRaw);
 }
 
 window.showTab = showTab;
