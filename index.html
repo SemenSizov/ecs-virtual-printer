@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Virtual Printer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background: #f9f9f9;
+            color: #333;
+            height: 100vh;
+            display: flex;
+        }
+
+        #sidebar {
+            width: 250px;
+            background: #eee;
+            border-right: 1px solid #ccc;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #sidebar h2 {
+            margin: 10px;
+            font-size: 18px;
+        }
+
+        #tabs {
+            display: flex;
+            flex-direction: column;
+            margin: 10px;
+        }
+
+        #tabs button {
+            margin-bottom: 5px;
+            padding: 8px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            background: #e0e0e0;
+            text-align: left;
+        }
+
+        #tabs button.active {
+            background: #1976d2;
+            color: white;
+        }
+
+        #file-list {
+            flex: 1;
+            overflow-y: auto;
+            border-top: 1px solid #ccc;
+        }
+
+        .file-item {
+            padding: 6px 10px;
+            cursor: pointer;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .file-item:hover {
+            background: #e3f2fd;
+        }
+
+        .file-item.active {
+            background: #bbdefb;
+        }
+
+        #content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            min-height: 0;
+        }
+
+        button.action {
+            margin: 5px;
+            padding: 6px 14px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            background: #1976d2;
+            color: white;
+        }
+
+        button.action:hover {
+            background: #145a9e;
+        }
+
+        .content-header {
+            flex: 0 0 auto;
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+            background: #fafafa;
+        }
+
+        .content-body {
+            flex: 1 1 auto;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            padding: 10px;
+        }
+
+        .content-body pre {
+            flex: 1 1 auto;
+            min-height: 0;
+            overflow-y: auto;
+            margin: 0;
+            background: #f1f1f1;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 10px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            overflow-wrap: break-word;
+        }
+
+        mark {
+            background: yellow;
+            color: black;
+            padding: 0 2px;
+        }
+
+        mark.active-mark {
+            background: orange;
+        }
+
+        .counter {
+            margin-left: 10px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        #current,
+        #history {
+            flex: 1 1 auto;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <div id="sidebar">
+        <h2>Menu</h2>
+        <div id="tabs">
+            <button id="tab-current" onclick="showTab('current')" class="active">Current</button>
+            <button id="tab-history" onclick="showTab('history')">History</button>
+        </div>
+        <div id="file-list"></div>
+    </div>
+
+    <!-- Content -->
+    <div id="content">
+        <!-- Current -->
+        <div id="current">
+            <div class="content-header">
+                <h2>Current session</h2>
+                <div>
+                    <button class="action" onclick="newFile()">Start new file</button>
+                    <button class="action" onclick="printSelection()">Print selection</button>
+                    <button class="action" onclick="saveSelection()">Save selection</button>
+                    <button class="action" onclick="printAll()">Print all</button>
+                    <button class="action" onclick="saveAll()">Save all</button>
+                </div>
+                <div>
+                    <input type="text" id="search-current" placeholder="Search in current..."
+                        oninput="searchInCurrent()" />
+                    <button class="action" onclick="prevMatch('current')">Prev</button>
+                    <button class="action" onclick="nextMatch('current')">Next</button>
+                    <span id="counter-current" class="counter"></span>
+                </div>
+            </div>
+            <div class="content-body">
+                <pre id="log" contenteditable="true"></pre>
+            </div>
+        </div>
+
+        <!-- History -->
+        <div id="history" style="display:none;">
+            <div class="content-header">
+                <h2>History</h2>
+                <div>
+                    <input type="text" id="search-box" placeholder="Search in file..." oninput="searchInHistory()" />
+                    <button class="action" onclick="prevMatch('history')">Prev</button>
+                    <button class="action" onclick="nextMatch('history')">Next</button>
+                    <span id="counter-history" class="counter"></span>
+                </div>
+                <div>
+                    <button class="action" onclick="printHistory()">Print this file</button>
+                    <button class="action" onclick="saveHistory()">Save this file as…</button>
+                </div>
+            </div>
+            <div class="content-body">
+                <pre id="history-content"></pre>
+            </div>
+        </div>
+    </div>
+
+    <script src="renderer.js"></script>
+</body>
+
+</html>
