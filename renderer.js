@@ -20,7 +20,7 @@ ipcRenderer.on("printer-data", (e, data) => {
         highlightText(log, term, "current");
     } else {
         log.textContent += data;
-        log.scrollTop = log.scrollHeight;
+        log.scrollTop = log.scrollHeight; // автоскрол вниз
     }
 });
 
@@ -42,7 +42,8 @@ ipcRenderer.on("history-list", (e, files) => {
         let displayName = f.name.replace(".prn", "");
         displayName = displayName.replace("_", " ");
         displayName = displayName.replace(/-/g, (m, i) =>
-            i > displayName.indexOf(" ") ? ":" : "-");
+            i > displayName.indexOf(" ") ? ":" : "-"
+        );
 
         div.textContent = displayName;
         div.title = f.name;
@@ -57,8 +58,7 @@ ipcRenderer.on("history-list", (e, files) => {
 
 ipcRenderer.on("history-file", (e, { filePath, content }) => {
     currentHistoryFile = filePath;
-    historyContent.textContent = ""
-    historyContent.textContent += content;
+    historyContent.textContent = content;
     historyContent.dataset.raw = content;
     searchState.history = { matches: [], index: -1 };
     updateCounter("history");
@@ -66,18 +66,31 @@ ipcRenderer.on("history-file", (e, { filePath, content }) => {
 
 // === Tab switch ===
 function showTab(id) {
-    document.getElementById("current").style.display = (id === "current") ? "block" : "none";
-    document.getElementById("history").style.display = (id === "history") ? "block" : "none";
+    document.getElementById("log").style.display = (id === "current") ? "block" : "none";
+    document.getElementById("history-content").style.display = (id === "history") ? "block" : "none";
 
     document.getElementById("tab-current").classList.toggle("active", id === "current");
     document.getElementById("tab-history").classList.toggle("active", id === "history");
 
+    // Дії
+    document.getElementById("actions-current").style.display = (id === "current") ? "block" : "none";
+    document.getElementById("actions-history").style.display = (id === "history") ? "block" : "none";
+
+    // Пошук
+    document.getElementById("search-current").style.display = (id === "current") ? "block" : "none";
+    document.getElementById("search-current-controls").style.display = (id === "current") ? "block" : "none";
+
+    document.getElementById("search-box").style.display = (id === "history") ? "block" : "none";
+    document.getElementById("search-history-controls").style.display = (id === "history") ? "block" : "none";
+
+    // Список файлів
     document.getElementById("file-list").style.display = (id === "history") ? "block" : "none";
 
     if (id === "history") {
         ipcRenderer.send("get-history");
     }
 }
+
 
 // === Actions ===
 function newFile() { ipcRenderer.send("new-file"); }
@@ -109,7 +122,7 @@ function highlightText(container, term, mode) {
     container.dataset.raw = raw;
 
     if (!term) {
-        container.innerHTML = raw;
+        container.textContent = raw;
         searchState[mode] = { matches: [], index: -1 };
         updateCounter(mode);
         return;

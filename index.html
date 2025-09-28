@@ -12,28 +12,28 @@
             color: #333;
             height: 100vh;
             display: flex;
+            overflow: hidden;
+            /* блокуємо глобальний скрол */
         }
 
         #sidebar {
-            width: 250px;
+            width: 260px;
             background: #eee;
             border-right: 1px solid #ccc;
             display: flex;
             flex-direction: column;
+            padding: 10px;
+            box-sizing: border-box;
         }
 
         #sidebar h2 {
-            margin: 10px;
+            margin: 5px 0 10px 0;
             font-size: 18px;
         }
 
-        #tabs {
-            display: flex;
-            flex-direction: column;
-            margin: 10px;
-        }
-
         #tabs button {
+            display: block;
+            width: 100%;
             margin-bottom: 5px;
             padding: 8px;
             border: none;
@@ -48,10 +48,61 @@
             color: white;
         }
 
+        #actions-current,
+        #actions-history,
+        #search {
+            margin: 10px 0;
+        }
+
+        #actions-current h3,
+        #actions-history h3,
+        #search h3 {
+            margin: 5px 0;
+            font-size: 14px;
+            color: #555;
+        }
+
+        #actions-current button,
+        #actions-history button,
+        #search button {
+            width: 100%;
+            margin-bottom: 5px;
+            padding: 6px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            background: #1976d2;
+            color: white;
+        }
+
+        #actions-current button:hover,
+        #actions-history button:hover,
+        #search button:hover {
+            background: #145a9e;
+        }
+
+        #search input {
+            width: 100%;
+            margin-bottom: 5px;
+            padding: 6px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .counter {
+            display: block;
+            text-align: center;
+            font-weight: bold;
+            color: #555;
+            margin-top: 3px;
+        }
+
         #file-list {
             flex: 1;
             overflow-y: auto;
             border-top: 1px solid #ccc;
+            margin-top: 10px;
         }
 
         .file-item {
@@ -74,42 +125,15 @@
             flex-direction: column;
             height: 100vh;
             min-height: 0;
+            overflow: hidden;
         }
 
-        button.action {
-            margin: 5px;
-            padding: 6px 14px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            background: #1976d2;
-            color: white;
-        }
-
-        button.action:hover {
-            background: #145a9e;
-        }
-
-        .content-header {
-            flex: 0 0 auto;
-            padding: 10px;
-            border-bottom: 1px solid #ccc;
-            background: #fafafa;
-        }
-
-        .content-body {
-            flex: 1 1 auto;
-            display: flex;
-            flex-direction: column;
-            min-height: 0;
-            padding: 10px;
-        }
-
-        .content-body pre {
+        #log,
+        #history-content {
             flex: 1 1 auto;
             min-height: 0;
             overflow-y: auto;
-            margin: 0;
+            margin: 10px;
             background: #f1f1f1;
             border: 1px solid #ccc;
             border-radius: 4px;
@@ -118,6 +142,7 @@
             white-space: pre-wrap;
             overflow-wrap: break-word;
         }
+
 
         mark {
             background: yellow;
@@ -128,20 +153,6 @@
         mark.active-mark {
             background: orange;
         }
-
-        .counter {
-            margin-left: 10px;
-            font-weight: bold;
-            color: #555;
-        }
-
-        #current,
-        #history {
-            flex: 1 1 auto;
-            display: flex;
-            flex-direction: column;
-            min-height: 0;
-        }
     </style>
 </head>
 
@@ -151,55 +162,53 @@
         <h2>Menu</h2>
         <div id="tabs">
             <button id="tab-current" onclick="showTab('current')" class="active">Поточні дані</button>
-            <button id="tab-history" onclick="showTab('history')">Попередні лог дані</button>
+            <button id="tab-history" onclick="showTab('history')">Попередні логи</button>
         </div>
-        <div id="file-list"></div>
+
+        <div id="actions-current">
+            <h3>Дії (Поточний)</h3>
+            <button onclick="newFile()">Новий лог</button>
+            <button onclick="saveSelection()">Зберегти виділене</button>
+            <button onclick="printSelection()">Друк виділеного</button>
+            <button onclick="saveAll()">Зберегти весь лог</button>
+            <button onclick="printAll()">Друк всього логу</button>
+        </div>
+
+        <div id="actions-history" style="display:none;">
+            <h3>Дії (Історія)</h3>
+            <button onclick="printHistory()">Друк історії</button>
+            <button onclick="saveHistory()">Зберегти історію</button>
+        </div>
+
+        <div id="search">
+            <h3>Пошук</h3>
+            <input type="text" id="search-current" placeholder="Пошук у поточному..." oninput="searchInCurrent()" />
+            <div id="search-current-controls">
+                <button onclick="prevMatch('current')">◀ Поточний</button>
+                <button onclick="nextMatch('current')">▶ Поточний</button>
+                <span id="counter-current" class="counter"></span>
+            </div>
+
+            <input type="text" id="search-box" placeholder="Пошук в історії..." oninput="searchInHistory()"
+                style="display:none;" />
+            <div id="search-history-controls" style="display:none;">
+                <button onclick="prevMatch('history')">◀ Історія</button>
+                <button onclick="nextMatch('history')">▶ Історія</button>
+                <span id="counter-history" class="counter"></span>
+            </div>
+        </div>
+
+        <div id="file-list" style="display:none;"></div>
     </div>
 
     <!-- Content -->
     <div id="content">
         <!-- Current -->
-        <div id="current">
-            <div class="content-header">
-                <h2>Поточні дані</h2>
-                <div>
-                    <button class="action" onclick="newFile()">Почати новий лог</button>
-                    <button class="action" onclick="saveSelection()">Зберегти виділений текст в файл</button>
-                    <button class="action" onclick="printSelection()">Надрукувати виділений текст</button>
-                    <button class="action" onclick="saveAll()">Зберегти лог в файл</button>
-                    <button class="action" onclick="printAll()">Надрукувати лог</button>
-                </div>
-                <div>
-                    <input type="text" id="search-current" placeholder="Пошук..." oninput="searchInCurrent()" />
-                    <button class="action" onclick="prevMatch('current')">Попередній</button>
-                    <button class="action" onclick="nextMatch('current')">Наступний</button>
-                    <span id="counter-current" class="counter"></span>
-                </div>
-            </div>
-            <div class="content-body">
-                <pre id="log" contenteditable="true"></pre>
-            </div>
-        </div>
+        <div id="log" class="log-view" contenteditable="true"></div>
 
         <!-- History -->
-        <div id="history" style="display:none;">
-            <div class="content-header">
-                <h2>Попередній лог</h2>
-                <div>
-                    <input type="text" id="search-box" placeholder="Search in file..." oninput="searchInHistory()" />
-                    <button class="action" onclick="prevMatch('history')">Попередній</button>
-                    <button class="action" onclick="nextMatch('history')">Наступний</button>
-                    <span id="counter-history" class="counter"></span>
-                </div>
-                <div>
-                    <button class="action" onclick="printHistory()">Роздрукувати лог</button>
-                    <button class="action" onclick="saveHistory()">Зберегти в файл</button>
-                </div>
-            </div>
-            <div class="content-body">
-                <pre id="history-content"></pre>
-            </div>
-        </div>
+        <div id="history-content" class="log-view"></div>
+
     </div>
 
     <script src="renderer.js"></script>
