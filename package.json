@@ -1,14 +1,36 @@
 {
   "name": "ecs-virtual-printer",
   "version": "1.0.0",
-  "description": "",
+  "description": "Fake printer with logs and SNMP/TCP emulation",
   "main": "main.js",
   "scripts": {
-    "start": "electron ."
+    "start": "electron .",
+    "pack": "electron-packager . ECS-Virtual-Printer --platform=win32 --arch=x64 --out=dist --overwrite --ignore=\"/print_jobs($|/)\" --ignore=\"/dist($|/)\" --ignore=\"/inst($|/)\" --ignore=\"/\\.git($|/)\"",
+    "dist": "electron-builder"
   },
   "author": "",
   "license": "ISC",
-  "dependencies": {
-    "electron": "^38.1.2"
+  "devDependencies": {
+    "electron": "^38.2.0",
+    "electron-builder": "^26.0.12",
+    "electron-packager": "^17.1.2"
+  },
+  "build": {
+    "appId": "com.ecs.virtualprinter",
+    "productName": "ECS Virtual Printer",
+    "directories": {
+      "output": "inst"
+    },
+    "files": [
+      "main.js",
+      "renderer.js",
+      "index.html",
+      "package.json"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "icon.ico",
+      "signAndEditExecutable": false
+    }
   }
 }

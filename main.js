@@ -8,6 +8,10 @@ let mainWindow;
 const jobsDir = path.join(__dirname, "print_jobs");
 if (!fs.existsSync(jobsDir)) fs.mkdirSync(jobsDir);
 
+// for app data
+// const jobsDir = path.join(app.getPath("userData"), "print_jobs");
+// if (!fs.existsSync(jobsDir)) fs.mkdirSync(jobsDir, { recursive: true });
+
 let currentFile = null;
 let printerStatus = 0;
 
@@ -177,7 +181,7 @@ ipcMain.on("get-history", (e) => {
     const files = fs.readdirSync(jobsDir)
         .filter(f => f.endsWith(".prn"))
         .map(f => ({ name: f, path: path.join(jobsDir, f) }))
-        .sort((a, b) => fs.statSync(b.path).mtime - fs.statSync(a.path)); // новіші зверху
+        .sort((a, b) => b.name.localeCompare(a.name));
     e.sender.send("history-list", files);
 });
 
