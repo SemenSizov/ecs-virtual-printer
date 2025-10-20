@@ -6,12 +6,49 @@ const historyContent = document.getElementById("history-content");
 
 let currentHistoryFile = null;
 let logRaw = "";
+let autoScroll = true;
 let historyRaw = "";
 
 let searchState = {
     current: { matches: [], index: -1 },
     history: { matches: [], index: -1 }
 };
+
+
+const SNMP_TIMEOUT_MS = 10000;
+let snmpTimer = null;
+
+function setStatusConnected() {
+    const el = document.getElementById("printer-status");
+    if (!el) return;
+    el.textContent = "Підключено";
+    el.classList.remove("error");
+    el.classList.add("ok");
+}
+
+function setStatusError() {
+    const el = document.getElementById("printer-status");
+    if (!el) return;
+    el.textContent = "Помилка підключення";
+    el.classList.remove("ok");
+    el.classList.add("error");
+}
+
+function armSnmpTimeout() {
+    if (snmpTimer) clearTimeout(snmpTimer);
+    snmpTimer = setTimeout(() => {
+        setStatusError();
+    }, SNMP_TIMEOUT_MS);
+}
+
+// Початково помилка (поки не було жодного пінгу)
+setStatusError();
+
+// На кожен пінг з main.js — оновлюємо статус і перевзводимо таймер
+ipcRenderer.on("snmp-ping", () => {
+    setStatusConnected();
+    armSnmpTimeout();
+});
 
 // === Current session ===
 ipcRenderer.on("printer-data", (e, data) => {
@@ -21,7 +58,7 @@ ipcRenderer.on("printer-data", (e, data) => {
         highlightText(log, term, "current", logRaw);
     } else {
         log.textContent += data;
-        log.scrollTop = log.scrollHeight;
+        if (autoScroll) log.scrollTop = log.scrollHeight;
     }
 });
 
@@ -189,6 +226,13 @@ function searchInHistory() {
     const term = document.getElementById("search-box").value;
     highlightText(historyContent, term, "history", historyRaw);
 }
+
+function toggleScroll() {
+    autoScroll = !autoScroll;
+    const btn = document.getElementById("toggle-scroll");
+    btn.textContent = `Автоскрол: ${autoScroll ? "УВІМК." : "ВИМК."}`;
+}
+window.toggleScroll = toggleScroll;
 
 window.showTab = showTab;
 window.newFile = newFile;
