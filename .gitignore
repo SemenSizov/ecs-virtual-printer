@@ -2,3 +2,5 @@ print_jobs
 node_modules
 dist
 inst
+
+out/

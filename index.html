@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>Virtual Printer</title>
+    <title>ECS Virtual Printer</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -156,7 +156,7 @@
             border: 1px solid #ccc;
             border-radius: 4px;
             padding: 10px;
-            font-family: monospace;
+            font-family: Consolas, "DejaVu Sans Mono", "Courier New", monospace;
             white-space: pre-wrap;
             overflow-wrap: break-word;
         }
@@ -170,6 +170,36 @@
         mark.active-mark {
             background: orange;
         }
+
+
+        #status {
+            margin: 6px 0 12px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-label {
+            font-size: 13px;
+            color: #555;
+        }
+
+        .status-badge {
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        .status-badge.ok {
+            background: #c8e6c9;
+            color: #256029;
+        }
+
+        .status-badge.error {
+            background: #ffcdd2;
+            color: #b00020;
+        }
     </style>
 </head>
 
@@ -177,6 +207,10 @@
     <!-- Sidebar -->
     <div id="sidebar">
         <h2>Меню</h2>
+        <div id="status">
+            <span class="status-label">Статус:</span>
+            <span id="printer-status" class="status-badge error">Помилка підключення</span>
+        </div>
         <div id="tabs">
             <button id="tab-current" onclick="showTab('current')" class="active">Поточний лог</button>
             <button id="tab-history" onclick="showTab('history')">Попередні логи</button>
@@ -189,6 +223,8 @@
             <button onclick="printSelection()">Друк виділеного</button>
             <button onclick="saveAll()">Зберегти як...</button>
             <button onclick="printAll()">Друк</button>
+            <hr />
+            <button id="toggle-scroll" onclick="toggleScroll()">Автоскрол: УВІМК.</button>
         </div>
 
         <div id="actions-history" style="display:none;">

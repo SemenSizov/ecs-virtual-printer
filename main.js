@@ -37,6 +37,24 @@ app.on("ready", () => {
         height: 700,
         webPreferences: { nodeIntegration: true, contextIsolation: false }
     });
+    const { Menu } = require("electron");
+
+    // === Custom minimal menu ===
+    const template = [
+        {
+            label: "File",
+            submenu: [
+                {
+                    label: "Exit",
+                    accelerator: "Ctrl+Q",
+                    click: () => { app.quit(); }
+                }
+            ]
+        }
+    ];
+
+    const menu = Menu.buildFromTemplate(template);
+    Menu.setApplicationMenu(menu);
     mainWindow.loadFile("index.html");
 
 
@@ -102,6 +120,9 @@ app.on("ready", () => {
     }
 
     snmpServer.on("message", (msg, rinfo) => {
+        if (mainWindow && !mainWindow.isDestroyed()) {
+            mainWindow.webContents.send("snmp-ping");
+        }
         try {
             let p = 0;
             if (msg[p++] !== 0x30) return;
