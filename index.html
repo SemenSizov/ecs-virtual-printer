@@ -156,7 +156,7 @@
             border: 1px solid #ccc;
             border-radius: 4px;
             padding: 10px;
-            font-family: Consolas, "DejaVu Sans Mono", "Courier New", monospace;
+            font-family: monospace;
             white-space: pre-wrap;
             overflow-wrap: break-word;
         }
@@ -262,8 +262,8 @@
 
     <!-- Content -->
     <div id="content">
-        <div id="log" contenteditable="true"></div>
-        <div id="history-content" style="display:none;"></div>
+        <pre id="log" contenteditable="true"></pre>
+        <pre id="history-content" style="display:none;"></pre>
     </div>
 
     <script src="renderer.js"></script>

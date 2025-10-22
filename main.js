@@ -5,12 +5,12 @@ const fs = require("fs");
 const path = require("path");
 
 let mainWindow;
-const jobsDir = path.join(__dirname, "print_jobs");
-if (!fs.existsSync(jobsDir)) fs.mkdirSync(jobsDir);
+// const jobsDir = path.join(__dirname, "print_jobs");
+// if (!fs.existsSync(jobsDir)) fs.mkdirSync(jobsDir);
 
 // for app data
-// const jobsDir = path.join(app.getPath("userData"), "print_jobs");
-// if (!fs.existsSync(jobsDir)) fs.mkdirSync(jobsDir, { recursive: true });
+const jobsDir = path.join(app.getPath("userData"), "print_jobs");
+if (!fs.existsSync(jobsDir)) fs.mkdirSync(jobsDir, { recursive: true });
 
 let currentFile = null;
 let printerStatus = 0;

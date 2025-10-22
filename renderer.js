@@ -18,6 +18,13 @@ let searchState = {
 const SNMP_TIMEOUT_MS = 10000;
 let snmpTimer = null;
 
+function normalizeNewlines(s) {
+    return String(s)
+        .replace(/\r\n/g, '\n')  // CRLF → LF
+        .replace(/\r/g, '\n');   // CR → LF
+}
+
+
 function setStatusConnected() {
     const el = document.getElementById("printer-status");
     if (!el) return;
@@ -52,12 +59,13 @@ ipcRenderer.on("snmp-ping", () => {
 
 // === Current session ===
 ipcRenderer.on("printer-data", (e, data) => {
-    logRaw += data;
+    const normalized = normalizeNewlines(data);
+    logRaw += normalized;
     const term = document.getElementById("search-current").value;
     if (term) {
         highlightText(log, term, "current", logRaw);
     } else {
-        log.textContent += data;
+        log.textContent += normalized;
         if (autoScroll) log.scrollTop = log.scrollHeight;
     }
 });
@@ -96,8 +104,9 @@ ipcRenderer.on("history-list", (e, files) => {
 
 ipcRenderer.on("history-file", (e, { filePath, content }) => {
     currentHistoryFile = filePath;
-    historyRaw = content;
-    historyContent.textContent = content;
+    const normalized = normalizeNewlines(content);
+    historyRaw = normalized;
+    historyContent.textContent = normalized;
     searchState.history = { matches: [], index: -1 };
     updateCounter("history");
 });
